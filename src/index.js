@@ -2,8 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
-import Grid from "@material-ui/core/Grid";
-
 function Square(props) {
   return (
     <button
@@ -23,16 +21,29 @@ class Board extends React.Component {
       <Square
         value={this.props.squares[i]}
         onClick={() => {
+          if (this.props.winner) {
+            const [a,b,c,d] = this.props.winningLine;
+            const winningSquare1 = document.getElementsByClassName("square")[a];
+            const winningSquare2 = document.getElementsByClassName("square")[b];
+            const winningSquare3 = document.getElementsByClassName("square")[c];
+            const winningSquare4 = document.getElementsByClassName("square")[d];
+
+            winningSquare1.style.backgroundColor = 'Yellow';
+            winningSquare2.style.backgroundColor = 'Yellow';
+            winningSquare3.style.backgroundColor = 'Yellow';
+            winningSquare4.style.backgroundColor = 'Yellow';
+            return;
+          }
           this.props.onClick(i);
           const xColor = "lightblue";
           const oColor = "lightgreen";
           const squareButton = document.getElementsByClassName("square")[i];
-          if (this.props.winner) {
-            return;
-          }
+
+
           this.props.xIsNext
             ? (squareButton.style.backgroundColor = xColor)
             : (squareButton.style.backgroundColor = oColor);
+
         }}
         squareIndex={i}
       />
@@ -43,28 +54,18 @@ class Board extends React.Component {
     return (
       <div>
         <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-          {this.renderSquare(3)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(8)}
-          {this.renderSquare(9)}
-          {this.renderSquare(10)}
-          {this.renderSquare(11)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(12)}
-          {this.renderSquare(13)}
-          {this.renderSquare(14)}
-          {this.renderSquare(15)}
+          {Array(4)
+            .fill(null)
+            .map((_, i) => {
+              const row = Array(4)
+                .fill(null)
+                .map((_, j) => this.renderSquare(4 * i + j));
+              return (
+                <div key={i} className="board-row">
+                  {row}
+                </div>
+              );
+            })}
         </div>
       </div>
     );
@@ -88,10 +89,7 @@ class Game extends React.Component {
     const current = history[history.length - 1];
     const squares = current.squares.slice();
 
-    //If there is a winner stop playing the game
-    if (this.state.winner) {
-      return;
-    }
+
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
       winner: !!calculateWinner(squares),
@@ -112,18 +110,15 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
-          <Grid container spacing={32}>
-            <Grid item xs={16} sm={16} md={8}>
               <Board
                 xIsNext={this.state.xIsNext}
                 winner={winner}
+                winningLine={calculateWinner(current.squares)}
                 squares={current.squares}
                 onClick={(i) => {
                   this.handleClick(i);
                 }}
               />
-            </Grid>
-          </Grid>
         </div>
         <div className="game-info">
           <div>{status}</div>
@@ -145,8 +140,8 @@ function calculateWinner(squares) {
     [8, 9, 10, 11],
     [12, 13, 14, 15],
     // This is all the diagonals
-    [0, 4, 8, 12],
     [0, 5, 10, 15],
+    [3, 6, 9, 12],
     // This is all the verticals
     [0, 4, 8, 12],
     [1, 5, 9, 13],
@@ -161,7 +156,7 @@ function calculateWinner(squares) {
       squares[a] === squares[c] &&
       squares[a] === squares[d]
     ) {
-      return squares[a];
+      return lines[i];
     }
   }
   return null;
