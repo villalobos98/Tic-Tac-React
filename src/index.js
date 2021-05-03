@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import ToggleSwitch from "./ToggleSwitch/toggleSwitch"
-import './ToggleSwitch/toggleSwitch.scss'
+import ToggleSwitch from "./ToggleSwitch/toggleSwitch";
+import "./ToggleSwitch/toggleSwitch.scss";
 function Square(props) {
   return (
     <button
@@ -122,7 +122,7 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <div className="game-board">'
+        <div className="game-board">
           <Board
             xIsNext={this.state.xIsNext}
             winner={winner}
@@ -144,7 +144,6 @@ class Game extends React.Component {
 // ========================================
 
 ReactDOM.render(<Game />, document.getElementById("root"));
-
 
 function calculateWinner(squares) {
   const lines = [
