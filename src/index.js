@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-
+import ToggleSwitch from "./ToggleSwitch/toggleSwitch"
+import './ToggleSwitch/toggleSwitch.scss'
 function Square(props) {
   return (
     <button
@@ -22,16 +23,16 @@ class Board extends React.Component {
         value={this.props.squares[i]}
         onClick={() => {
           if (this.props.winner) {
-            const [a,b,c,d] = this.props.winningLine;
+            const [a, b, c, d] = this.props.winningLine;
             const winningSquare1 = document.getElementsByClassName("square")[a];
             const winningSquare2 = document.getElementsByClassName("square")[b];
             const winningSquare3 = document.getElementsByClassName("square")[c];
             const winningSquare4 = document.getElementsByClassName("square")[d];
 
-            winningSquare1.style.backgroundColor = 'Yellow';
-            winningSquare2.style.backgroundColor = 'Yellow';
-            winningSquare3.style.backgroundColor = 'Yellow';
-            winningSquare4.style.backgroundColor = 'Yellow';
+            winningSquare1.style.backgroundColor = "Yellow";
+            winningSquare2.style.backgroundColor = "Yellow";
+            winningSquare3.style.backgroundColor = "Yellow";
+            winningSquare4.style.backgroundColor = "Yellow";
             return;
           }
           this.props.onClick(i);
@@ -39,11 +40,9 @@ class Board extends React.Component {
           const oColor = "lightgreen";
           const squareButton = document.getElementsByClassName("square")[i];
 
-
           this.props.xIsNext
             ? (squareButton.style.backgroundColor = xColor)
             : (squareButton.style.backgroundColor = oColor);
-
         }}
         squareIndex={i}
       />
@@ -82,6 +81,8 @@ class Game extends React.Component {
         },
       ],
       xIsNext: true,
+      winner: false,
+      draw: false,
     };
   }
   handleClick(i) {
@@ -89,6 +90,14 @@ class Game extends React.Component {
     const current = history[history.length - 1];
     const squares = current.squares.slice();
 
+    var areAllNotNull = squares.every(function (i) {
+      return i !== null;
+    });
+
+    if (areAllNotNull) {
+      this.setState({ draw: true });
+      return;
+    }
 
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
@@ -99,26 +108,30 @@ class Game extends React.Component {
   }
   render() {
     const history = this.state.history;
+    const draw = this.state.draw;
     const current = this.state.history[history.length - 1];
     const winner = !!calculateWinner(current.squares);
     let status;
     if (winner) {
       status = "Winner: " + (this.state.xIsNext ? "O" : "X");
+    } else if (draw) {
+      status = "Game is a draw !";
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
     }
+
     return (
       <div className="game">
-        <div className="game-board">
-              <Board
-                xIsNext={this.state.xIsNext}
-                winner={winner}
-                winningLine={calculateWinner(current.squares)}
-                squares={current.squares}
-                onClick={(i) => {
-                  this.handleClick(i);
-                }}
-              />
+        <div className="game-board">'
+          <Board
+            xIsNext={this.state.xIsNext}
+            winner={winner}
+            winningLine={calculateWinner(current.squares)}
+            squares={current.squares}
+            onClick={(i) => {
+              this.handleClick(i);
+            }}
+          />
         </div>
         <div className="game-info">
           <div>{status}</div>
@@ -131,6 +144,7 @@ class Game extends React.Component {
 // ========================================
 
 ReactDOM.render(<Game />, document.getElementById("root"));
+
 
 function calculateWinner(squares) {
   const lines = [
